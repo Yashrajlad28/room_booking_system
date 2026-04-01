@@ -1,0 +1,214 @@
+<div class="container mt-4" style="max-width: 860px;">
+
+  <%# ---- Page header ---- %>
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+      <h3 class="fw-bold mb-0" style="color: #1a1f2e; font-size: 1.2rem;">New Booking</h3>
+      <p class="mb-0 mt-1" style="font-size: 0.8rem; color: #8a93a8;">
+        Search for an available room and reserve it instantly
+      </p>
+    </div>
+    <%= link_to bookings_path,
+        style: "font-size: 0.8rem; color: #5a6480; text-decoration: none;" do %>
+      &#8592; My Bookings
+    <% end %>
+  </div>
+
+  <%# ======================================================
+      SEARCH FORM
+      ====================================================== %>
+  <div class="bg-white rounded-3 mb-4"
+       style="border: 1px solid rgba(0,0,0,0.07); overflow: hidden;">
+
+    <div class="d-flex align-items-center gap-2 px-4 py-3"
+         style="border-bottom: 1px solid rgba(0,0,0,0.06);">
+      <span style="width:8px; height:8px; border-radius:50%;
+                   background:#4e9af1; display:inline-block;"></span>
+      <h5 class="mb-0 fw-semibold" style="font-size: 0.88rem; color: #1a1f2e;">
+        Search available rooms
+      </h5>
+    </div>
+
+    <div class="p-4">
+      <%= form_with(url: new_booking_path, method: :get) do |f| %>
+
+        <div class="row g-3 align-items-end">
+
+          <%# Date %>
+          <div class="col-md-4">
+            <%= f.label :booking_date, "Date", class: "form-label fw-medium",
+                style: "font-size: 0.8rem; color: #3a3f52;" %>
+            <%= f.date_field :booking_date,
+                value: params[:booking_date] || Date.today,
+                class: "form-control",
+                required: true,
+                style: "border-radius: 7px; font-size: 0.875rem; border-color: #d1d5e0;" %>
+          </div>
+
+          <%# Start time %>
+          <div class="col-md-3">
+            <%= f.label :start_time, "Start time", class: "form-label fw-medium",
+                style: "font-size: 0.8rem; color: #3a3f52;" %>
+            <div class="d-flex gap-1">
+              <%= f.time_select :start_time,
+                  {
+                    start_hour:  10,
+                    end_hour:    22,
+                    minute_step: 15,
+                    ignore_date: true,
+                    ampm:        true,
+                    default:     @start_t || Time.zone.now
+                  },
+                  { class: "form-select",
+                    style: "border-radius: 7px; font-size: 0.8rem; border-color: #d1d5e0;" } %>
+            </div>
+          </div>
+
+          <%# End time %>
+          <div class="col-md-3">
+            <%= f.label :end_time, "End time", class: "form-label fw-medium",
+                style: "font-size: 0.8rem; color: #3a3f52;" %>
+            <div class="d-flex gap-1">
+              <%= f.time_select :end_time,
+                  {
+                    start_hour:  10,
+                    end_hour:    22,
+                    minute_step: 15,
+                    ignore_date: true,
+                    ampm:        true,
+                    default:     @end_t || Time.zone.now
+                  },
+                  { class: "form-select",
+                    style: "border-radius: 7px; font-size: 0.8rem; border-color: #d1d5e0;" } %>
+            </div>
+          </div>
+
+          <%# Submit %>
+          <div class="col-md-2">
+            <%= f.submit "Search",
+                class: "btn w-100 fw-medium",
+                style: "background: #4e9af1; color: #fff; border-radius: 7px;
+                        font-size: 0.875rem; padding: 9px;" %>
+          </div>
+
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <%# ======================================================
+      AVAILABLE ROOMS — only shown after a search
+      ====================================================== %>
+  <% if params[:booking_date].present? %>
+
+    <% if @booking.valid? %>
+
+      <div class="bg-white rounded-3 mb-4"
+           style="border: 1px solid rgba(0,0,0,0.07); overflow: hidden;">
+
+        <div class="d-flex align-items-center gap-2 px-4 py-3"
+             style="border-bottom: 1px solid rgba(0,0,0,0.06);">
+          <span style="width:8px; height:8px; border-radius:50%;
+                       background:#639922; display:inline-block;"></span>
+          <h5 class="mb-0 fw-semibold" style="font-size: 0.88rem; color: #1a1f2e;">
+            Available rooms
+          </h5>
+          <% if @available_rooms.present? %>
+            <span class="ms-auto d-flex align-items-center gap-1"
+                  style="background:#eaf3de; color:#3b6d11; font-size:0.72rem;
+                         font-weight:500; padding:3px 10px; border-radius:20px;">
+              <span style="width:5px;height:5px;border-radius:50%;
+                           background:#639922;display:inline-block;"></span>
+              <%= @available_rooms.count %> available
+            </span>
+          <% end %>
+        </div>
+
+        <div class="p-4">
+
+          <% if @available_rooms.present? %>
+
+            <div class="row g-3">
+              <% @available_rooms.each do |room| %>
+                <div class="col-md-4">
+
+                  <div class="h-100 rounded-3 p-3"
+                       style="border: 1px solid rgba(0,0,0,0.08);
+                              transition: border-color 0.15s, background 0.15s;"
+                       onmouseover="this.style.borderColor='#4e9af1';this.style.background='#f8fbff';"
+                       onmouseout="this.style.borderColor='rgba(0,0,0,0.08)';this.style.background='#fff';">
+
+                    <%# Room name %>
+                    <p class="fw-semibold mb-1" style="font-size: 0.9rem; color: #1a1f2e;">
+                      <%= room.name %>
+                    </p>
+
+                    <%# Time slot badge %>
+                    <div class="d-flex align-items-center gap-1 mb-3"
+                         style="background:#f4f6fa; border-radius:6px;
+                                padding:5px 8px; width:fit-content;">
+                      <svg width="13" height="13" fill="none" viewBox="0 0 24 24"
+                           stroke="#8a93a8" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path stroke-linecap="round" d="M12 6v6l4 2"/>
+                      </svg>
+                      <span style="font-size:0.75rem; color:#5a6480;">
+                        <%= @start_t.strftime("%I:%M %p") %> – <%= @end_t.strftime("%I:%M %p") %>
+                      </span>
+                    </div>
+
+                    <%# Booking form — hidden fields + submit %>
+                    <%= form_with model: @booking, url: bookings_path do |f| %>
+                      <%= f.hidden_field :room_id,      value: room.id %>
+                      <%= f.hidden_field :booking_date, value: params[:booking_date] %>
+                      <%= f.hidden_field :start_time,   value: @start_t %>
+                      <%= f.hidden_field :end_time,     value: @end_t %>
+
+                      <%= f.submit "Book this room",
+                          class: "btn fw-medium",
+                          style: "background: #1a1f2e; color: #fff; border-radius: 7px;
+                                  font-size: 0.78rem; padding: 6px 16px;
+                                  transition: background 0.15s;",
+                          onmouseover: "this.style.background='#2c3350'",
+                          onmouseout:  "this.style.background='#1a1f2e'" %>
+                    <% end %>
+
+                  </div>
+                </div>
+              <% end %>
+            </div>
+
+          <% else %>
+
+            <%# Empty state %>
+            <div class="text-center py-4">
+              <div class="mx-auto mb-3 d-flex align-items-center justify-content-center"
+                   style="width:44px; height:44px; border-radius:50%; background:#fceaea;">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24"
+                     stroke="#e24b4a" stroke-width="1.8">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5A2.25 2.25 0
+                           015.25 5.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18
+                           0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021
+                           18.75m-18 0v-7.5m18 7.5v-7.5m-9 3.75h.008v.008H12v-.008z"/>
+                </svg>
+              </div>
+              <p class="fw-semibold mb-1" style="font-size:0.9rem; color:#1a1f2e;">
+                No rooms available
+              </p>
+              <p style="font-size:0.82rem; color:#8a93a8;">
+                Try a different date or time slot.
+              </p>
+            </div>
+
+          <% end %>
+        </div>
+      </div>
+
+    <% else %>
+      <% flash.now[:alert] = @booking.errors.full_messages.join(", ") %>
+    <% end %>
+
+  <% end %>
+
+</div>

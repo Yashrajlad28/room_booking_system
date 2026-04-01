@@ -1,0 +1,37 @@
+<% content_for :head do %>
+  <meta name="turbo-cache-control" content="no-cache">
+<% end %>
+
+<div class="container mt-4">
+
+  <%# ---- Page header ---- %>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h3 class="fw-bold mb-0" style="color: #1a1f2e; font-size: 1.3rem;">
+        <%= current_user.name %>'s Bookings
+      </h3>
+      <p class="mb-0 mt-1" style="font-size: 0.82rem; color: #8a93a8;">
+        <%= @bookings.count %> total &nbsp;·&nbsp;
+        <span style="color: #185fa5;"><%= @bookings.where(status: 'booked').count %> booked</span>
+        &nbsp;·&nbsp;
+        <span style="color: #a32d2d;"><%= @bookings.where(status: 'cancelled').count %> cancelled</span>
+      </p>
+    </div>
+    <%= link_to "New Booking", new_booking_path,
+        class: "btn fw-medium",
+        style: "background: #4e9af1; color: #fff; border-radius: 7px;
+                font-size: 0.875rem; padding: 8px 20px;" %>
+  </div>
+
+  <% if @bookings.any? %>
+    <%# ---- Calendar view ---- %>
+    <%= render 'shared/bookings_calendar' %>
+  <% else %>
+    <div class="text-center py-5" style="color: #8a93a8;">
+      <p class="mb-3" style="font-size: 0.95rem;">No bookings yet.</p>
+      <%= link_to "Make your first booking →", new_booking_path,
+          style: "color: #4e9af1; font-size: 0.875rem; text-decoration: none;" %>
+    </div>
+  <% end %>
+
+</div>

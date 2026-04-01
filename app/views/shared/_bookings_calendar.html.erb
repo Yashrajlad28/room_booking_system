@@ -1,0 +1,300 @@
+<%# ============================================================
+    Bookings Calendar Partial
+    Expects: @bookings (ActiveRecord collection)
+    ============================================================ %>
+
+<style>
+  .rb-cal-wrap { font-family: 'Segoe UI', system-ui, sans-serif; }
+
+  .rb-cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .rb-cal-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .rb-cal-nav-btn {
+    background: #fff;
+    border: 1px solid #d1d5e0;
+    border-radius: 6px;
+    width: 30px;
+    height: 30px;
+    font-size: 1rem;
+    cursor: pointer;
+    color: #1a1f2e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+  }
+
+  .rb-cal-nav-btn:hover { background: #f0f2f8; }
+
+  .rb-cal-month {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1a1f2e;
+    min-width: 130px;
+    text-align: center;
+  }
+
+  .rb-cal-today-btn {
+    background: #fff;
+    border: 1px solid #d1d5e0;
+    border-radius: 6px;
+    padding: 5px 14px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: #1a1f2e;
+  }
+
+  .rb-cal-today-btn:hover { background: #f0f2f8; }
+
+  .rb-cal-grid {
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid rgba(0,0,0,0.07);
+    overflow: hidden;
+  }
+
+  .rb-day-headers {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: #f8f9fc;
+    border-bottom: 1px solid rgba(0,0,0,0.07);
+  }
+
+  .rb-day-hdr {
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #8a93a8;
+    padding: 8px 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .rb-cal-body {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+
+  .rb-cal-cell {
+    min-height: 95px;
+    border-right: 1px solid rgba(0,0,0,0.05);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    padding: 6px 5px;
+  }
+
+  .rb-cal-cell:nth-child(7n) { border-right: none; }
+
+  .rb-cal-cell.rb-other-month .rb-day-num { color: #c8cdd8; }
+
+  .rb-day-num {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #3a3f52;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin-bottom: 4px;
+  }
+
+  .rb-cal-cell.rb-today .rb-day-num {
+    background: #1a1f2e;
+    color: #fff;
+  }
+
+  .rb-event {
+    border-radius: 4px;
+    padding: 3px 6px;
+    margin-bottom: 3px;
+    font-size: 0.68rem;
+    font-weight: 500;
+    cursor: pointer;
+    line-height: 1.35;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-decoration: none;
+    display: block;
+  }
+
+  .rb-event:hover { opacity: 0.85; }
+
+  .rb-event.rb-booked {
+    background: #e6f1fb;
+    color: #185fa5;
+    border-left: 3px solid #4e9af1;
+  }
+
+  .rb-event.rb-cancelled {
+    background: #fceaea;
+    color: #7a1e1e;
+    border-left: 3px solid #e24b4a;
+    text-decoration: line-through;
+    opacity: 0.8;
+  }
+
+  .rb-legend {
+    display: flex;
+    gap: 1.25rem;
+    margin-top: 0.75rem;
+  }
+
+  .rb-leg-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: #5a6480;
+  }
+
+  .rb-leg-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+  }
+
+  .rb-leg-dot.rb-booked    { background: #e6f1fb; border-left: 3px solid #4e9af1; }
+  .rb-leg-dot.rb-cancelled { background: #fceaea; border-left: 3px solid #e24b4a; }
+</style>
+
+<%# Serialize bookings to JSON for JS to consume %>
+<script>
+  const RB_BOOKINGS = <%= raw @bookings.map { |b| {
+    id:     b.id,
+    date:   b.booking_date.strftime("%Y-%m-%d"),
+    room:   b.room.name,
+    start:  b.start_time.strftime("%I:%M %p"),
+    finish: b.end_time.strftime("%I:%M %p"),
+    status: b.status,
+    url:    "/bookings/#{b.id}"
+  }}.to_json %>;
+</script>
+
+<%# ---- Calendar markup ---- %>
+<div class="rb-cal-wrap">
+
+  <div class="rb-cal-header">
+    <div class="rb-cal-nav">
+      <button class="rb-cal-nav-btn" id="rbPrev">&#8249;</button>
+      <span class="rb-cal-month" id="rbMonthLabel"></span>
+      <button class="rb-cal-nav-btn" id="rbNext">&#8250;</button>
+    </div>
+    <button class="rb-cal-today-btn" id="rbToday">Today</button>
+  </div>
+
+  <div class="rb-cal-grid">
+    <div class="rb-day-headers">
+      <% %w[Sun Mon Tue Wed Thu Fri Sat].each do |d| %>
+        <div class="rb-day-hdr"><%= d %></div>
+      <% end %>
+    </div>
+    <div class="rb-cal-body" id="rbCalBody"></div>
+  </div>
+
+  <div class="rb-legend">
+    <div class="rb-leg-item">
+      <div class="rb-leg-dot rb-booked"></div> Booked
+    </div>
+    <div class="rb-leg-item">
+      <div class="rb-leg-dot rb-cancelled"></div> Cancelled
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function() {
+  const MONTHS = ["January","February","March","April","May","June",
+                  "July","August","September","October","November","December"];
+
+  const today = new Date();
+  let current = { year: today.getFullYear(), month: today.getMonth() };
+
+  function render(year, month) {
+    const body      = document.getElementById('rbCalBody');
+    const label     = document.getElementById('rbMonthLabel');
+    label.textContent = MONTHS[month] + ' ' + year;
+    body.innerHTML  = '';
+
+    const firstDay     = new Date(year, month, 1).getDay();
+    const daysInMonth  = new Date(year, month + 1, 0).getDate();
+    const daysInPrev   = new Date(year, month, 0).getDate();
+
+    let cells = [];
+    for (let i = 0; i < firstDay; i++)
+      cells.push({ day: daysInPrev - firstDay + 1 + i, other: true });
+    for (let i = 1; i <= daysInMonth; i++)
+      cells.push({ day: i, other: false });
+    while (cells.length % 7 !== 0)
+      cells.push({ day: cells.length - daysInMonth - firstDay + 1, other: true });
+
+    cells.forEach(function(c) {
+      const cell = document.createElement('div');
+      cell.className = 'rb-cal-cell' + (c.other ? ' rb-other-month' : '');
+
+      const isToday = !c.other &&
+                      c.day === today.getDate() &&
+                      month === today.getMonth() &&
+                      year  === today.getFullYear();
+      if (isToday) cell.classList.add('rb-today');
+
+      const dn = document.createElement('div');
+      dn.className    = 'rb-day-num';
+      dn.textContent  = c.day;
+      cell.appendChild(dn);
+
+      if (!c.other) {
+        const dateStr = year + '-' +
+                        String(month + 1).padStart(2, '0') + '-' +
+                        String(c.day).padStart(2, '0');
+
+        RB_BOOKINGS
+          .filter(function(b) { return b.date === dateStr; })
+          .forEach(function(b) {
+            const ev        = document.createElement('a');
+            ev.className    = 'rb-event rb-' + b.status;
+            ev.href         = b.url;
+            ev.title        = b.room + '\n' + b.start + ' – ' + b.finish;
+            ev.textContent  = b.room.replace(' Conference Room', '').replace(' Room', '');
+            cell.appendChild(ev);
+          });
+      }
+
+      body.appendChild(cell);
+    });
+  }
+
+  document.getElementById('rbPrev').addEventListener('click', function() {
+    current.month--;
+    if (current.month < 0) { current.month = 11; current.year--; }
+    render(current.year, current.month);
+  });
+
+  document.getElementById('rbNext').addEventListener('click', function() {
+    current.month++;
+    if (current.month > 11) { current.month = 0; current.year++; }
+    render(current.year, current.month);
+  });
+
+  document.getElementById('rbToday').addEventListener('click', function() {
+    current = { year: today.getFullYear(), month: today.getMonth() };
+    render(current.year, current.month);
+  });
+
+  render(current.year, current.month);
+})();
+</script>

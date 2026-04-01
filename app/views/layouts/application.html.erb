@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Room Booking</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+  <%# ========== NAVBAR ========== %>
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+
+      <% if user_signed_in? %>
+        <%= link_to bookings_path, class: "navbar-brand text-white" do %>
+          <span class="brand-dot"></span> RoomBooking
+        <% end %>
+      <% else %>
+        <%= link_to root_path, class: "navbar-brand text-white" do %>
+          <span class="brand-dot"></span> RoomBooking
+        <% end %>
+      <% end %>
+
+      <button class="navbar-toggler border-0" type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbarNav"
+              aria-controls="navbarNav"
+              aria-expanded="false"
+              aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+
+        <ul class="navbar-nav me-auto">
+          <% if user_signed_in? %>
+            <li class="nav-item">
+              <%= link_to "New Booking", new_booking_path,
+                  class: "nav-link #{current_page?(new_booking_path) ? 'active' : ''}" %>
+            </li>
+            <li class="nav-item">
+              <%= link_to "My Bookings", bookings_path,
+                  class: "nav-link #{current_page?(bookings_path) ? 'active' : ''}" %>
+            </li>
+          <% end %>
+        </ul>
+
+        <ul class="navbar-nav align-items-center gap-2">
+          <% if user_signed_in? %>
+            <li class="nav-item">
+              <span class="navbar-text">
+                Welcome, <strong><%= current_user.name %></strong>
+              </span>
+            </li>
+            <li class="nav-item">
+              <%= button_to "Logout",
+                  destroy_user_session_path,
+                  method: :delete,
+                  class: "btn-nav-logout" %>
+            </li>
+          <% else %>
+            <li class="nav-item">
+              <button class="btn-nav-login"
+                      data-bs-toggle="modal"
+                      data-bs-target="#loginModal">
+                Login
+              </button>
+            </li>
+          <% end %>
+        </ul>
+
+      </div>
+    </div>
+  </nav>
+
+  <%# ========== FLASH MESSAGES ========== %>
+  <div class="container flash-wrapper">
+    <% if notice %>
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-2"></i><%= notice %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    <% end %>
+    <% if alert %>
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-circle me-2"></i><%= alert %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    <% end %>
+  </div>
+
+  <%# ========== MAIN CONTENT ========== %>
+  <main>
+    <div class="container mt-4">
+      <%= yield %>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <%# ====== LOGIN MODAL — included globally so any page can trigger it ====== %>
+  <% unless user_signed_in? %>
+
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
+        <div class="modal-content border-0 rounded-3 overflow-hidden"
+            style="box-shadow: 0 8px 32px rgba(0,0,0,0.18);">
+
+          <%# Header %>
+          <div class="modal-header border-0 justify-content-center py-4 position-relative"
+              style="background: #1a1f2e;">
+            <button type="button" class="btn-close btn-close-white position-absolute"
+                    style="top: 1rem; right: 1rem; opacity: 0.5;"
+                    data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="text-center">
+              <p class="mb-1">
+                <span style="display:inline-block; width:8px; height:8px; border-radius:50%;
+                            background:#4e9af1; margin-right:6px; vertical-align:middle;"></span>
+                <span class="fw-semibold text-white" style="font-size:1rem; vertical-align:middle;">
+                  RoomBooking
+                </span>
+              </p>
+              <p class="mb-0" style="font-size: 0.8rem; color: #8a93a8;">Sign in to your account</p>
+            </div>
+          </div>
+
+          <%# Body — reuses the same Devise form %>
+          <div class="modal-body p-4" style="background: #fff;">
+
+            <%= form_for(User.new, as: :user, url: user_session_path) do |f| %>
+
+              <div class="mb-3">
+                <%= f.label :email, "Email address", class: "form-label fw-medium",
+                    style: "font-size: 0.82rem; color: #3a3f52;" %>
+                <%= f.email_field :email,
+                    autocomplete: "email",
+                    placeholder: "you@example.com",
+                    class: "form-control",
+                    required: true,
+                    style: "border-radius: 7px; font-size: 0.875rem; border-color: #d1d5e0;" %>
+              </div>
+
+              <div class="mb-3">
+                <%= f.label :password, class: "form-label fw-medium",
+                    style: "font-size: 0.82rem; color: #3a3f52;" %>
+                <%= f.password_field :password,
+                    autocomplete: "current-password",
+                    placeholder: "••••••••",
+                    class: "form-control",
+                    required: true,
+                    style: "border-radius: 7px; font-size: 0.875rem; border-color: #d1d5e0;" %>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="form-check mb-0">
+                  <%= f.check_box :remember_me, class: "form-check-input" %>
+                  <%= f.label :remember_me, class: "form-check-label",
+                      style: "font-size: 0.8rem; color: #5a6480;" %>
+                </div>
+
+                <a href="#" data-bs-dismiss="modal" data-bs-toggle="modal"
+                  data-bs-target="#forgotModal"
+                  style="font-size: 0.8rem; color: #4e9af1; text-decoration: none;">
+                  Forgot your password?
+                </a>
+                                
+              </div>
+
+              <div class="d-grid mb-3">
+                <%= f.submit "Log in", class: "btn fw-medium",
+                    style: "background: #4e9af1; color: #fff; border-radius: 7px;
+                            font-size: 0.875rem; padding: 10px;" %>
+              </div>
+
+            <% end %>
+
+            <hr style="border-color: rgba(0,0,0,0.07); margin-bottom: 1rem;">
+
+            <p class="text-center mb-0" style="font-size: 0.82rem; color: #8a93a8;">
+              Don't have an account?
+              <a href="#" data-bs-dismiss="modal" data-bs-toggle="modal"
+                data-bs-target="#registerModal"
+                style="color: #4e9af1; font-weight: 500; text-decoration: none;">Sign up</a>
+            </p>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <% end %>
+
+  <% unless user_signed_in? %>
+    <div class="modal fade" id="registerModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
+        <div class="modal-content border-0 rounded-3 overflow-hidden"
+            style="box-shadow: 0 8px 32px rgba(0,0,0,0.18);">
+
+          <div class="modal-header border-0 justify-content-center py-4 position-relative"
+              style="background: #1a1f2e;">
+            <button type="button" class="btn-close btn-close-white position-absolute"
+                    style="top: 1rem; right: 1rem; opacity: 0.5;"
+                    data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="text-center">
+              <p class="mb-1">
+                <span style="display:inline-block; width:8px; height:8px; border-radius:50%;
+                            background:#4e9af1; margin-right:6px; vertical-align:middle;"></span>
+                <span class="fw-semibold text-white" style="font-size:1rem; vertical-align:middle;">RoomBooking</span>
+              </p>
+              <p class="mb-0" style="font-size: 0.8rem; color: #8a93a8;">Create your account</p>
+            </div>
+          </div>
+
+          <div class="modal-body p-4" style="background: #fff;">
+            <%= form_for(User.new, as: :user, url: user_registration_path) do |f| %>
+
+              <div class="mb-3">
+                <%= f.label :email, "Email address", class: "form-label fw-medium",
+                    style: "font-size: 0.82rem; color: #3a3f52;" %>
+                <%= f.email_field :email,
+                    autocomplete: "email",
+                    placeholder: "you@example.com",
+                    class: "form-control",
+                    required: true,
+                    style: "border-radius: 7px; font-size: 0.875rem; border-color: #d1d5e0;" %>
+              </div>
+
+              <div class="mb-3">
+                <%= f.label :password, class: "form-label fw-medium",
+                    style: "font-size: 0.82rem; color: #3a3f52;" %>
+                <%= f.password_field :password,
+                    autocomplete: "new-password",
+                    placeholder: "••••••••",
+                    class: "form-control",
+                    required: true,
+                    style: "border-radius: 7px; font-size: 0.875rem; border-color: #d1d5e0;" %>
+              </div>
+
+              <div class="mb-4">
+                <%= f.label :password_confirmation, "Confirm password", class: "form-label fw-medium",
+                    style: "font-size: 0.82rem; color: #3a3f52;" %>
+                <%= f.password_field :password_confirmation,
+                    autocomplete: "new-password",
+                    placeholder: "••••••••",
+                    class: "form-control",
+                    required: true,
+                    style: "border-radius: 7px; font-size: 0.875rem; border-color: #d1d5e0;" %>
+              </div>
+
+              <div class="d-grid mb-3">
+                <%= f.submit "Create account", class: "btn fw-medium",
+                    style: "background: #4e9af1; color: #fff; border-radius: 7px;
+                            font-size: 0.875rem; padding: 10px;" %>
+              </div>
+            <% end %>
+
+            <hr style="border-color: rgba(0,0,0,0.07); margin-bottom: 1rem;">
+            <p class="text-center mb-0" style="font-size: 0.82rem; color: #8a93a8;">
+              Already have an account?
+              <a href="#" data-bs-dismiss="modal" data-bs-toggle="modal"
+                data-bs-target="#loginModal"
+                style="color: #4e9af1; font-weight: 500; text-decoration: none;">Log in</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+<% unless user_signed_in? %>
+  <div class="modal fade" id="forgotModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
+      <div class="modal-content border-0 rounded-3 overflow-hidden"
+           style="box-shadow: 0 8px 32px rgba(0,0,0,0.18);">
+
+        <div class="modal-header border-0 justify-content-center py-4 position-relative"
+             style="background: #1a1f2e;">
+          <button type="button" class="btn-close btn-close-white position-absolute"
+                  style="top: 1rem; right: 1rem; opacity: 0.5;"
+                  data-bs-dismiss="modal" aria-label="Close"></button>
+          <div class="text-center">
+            <p class="mb-1">
+              <span style="display:inline-block; width:8px; height:8px; border-radius:50%;
+                           background:#4e9af1; margin-right:6px; vertical-align:middle;"></span>
+              <span class="fw-semibold text-white" style="font-size:1rem; vertical-align:middle;">RoomBooking</span>
+            </p>
+            <p class="mb-0" style="font-size: 0.8rem; color: #8a93a8;">Reset your password</p>
+          </div>
+        </div>
+
+        <div class="modal-body p-4" style="background: #fff;">
+          <p class="mb-4" style="font-size: 0.85rem; color: #5a6480; line-height: 1.6;">
+            Enter the email address linked to your account and we'll send you a reset link.
+          </p>
+
+          <%= form_for(User.new, as: :user,
+            url: user_password_path,
+            html: { method: :post }) do |f| %>
+
+            <div class="mb-4">
+              <%= f.label :email, "Email address", class: "form-label fw-medium",
+                  style: "font-size: 0.82rem; color: #3a3f52;" %>
+              <%= f.email_field :email,
+                  autocomplete: "email",
+                  placeholder: "you@example.com",
+                  class: "form-control",
+                  required: true,
+                  style: "border-radius: 7px; font-size: 0.875rem; border-color: #d1d5e0;" %>
+            </div>
+
+            <div class="d-grid mb-3">
+              <%= f.submit "Send reset link", class: "btn fw-medium",
+                  style: "background: #4e9af1; color: #fff; border-radius: 7px;
+                          font-size: 0.875rem; padding: 10px;" %>
+            </div>
+          <% end %>
+
+          <hr style="border-color: rgba(0,0,0,0.07); margin-bottom: 1rem;">
+          <p class="text-center mb-0" style="font-size: 0.82rem; color: #8a93a8;">
+            Remember it now?
+            <a href="#" data-bs-dismiss="modal" data-bs-toggle="modal"
+               data-bs-target="#loginModal"
+               style="color: #4e9af1; font-weight: 500; text-decoration: none;">Back to login</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+</body>
+</html>

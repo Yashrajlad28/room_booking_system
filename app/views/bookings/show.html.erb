@@ -1,0 +1,19 @@
+<h1>Showing the details of Booking</h1>
+
+
+<%= button_to "Delete", booking_path(@booking), method: :delete, 
+data: { turbo_confirm: "Are you sure? You want to delete" } %>
+
+<%= link_to "Edit", edit_booking_path %>
+
+<%= button_to "Cancel Booking", cancel_booking_path(@booking), 
+            method: :patch, 
+            data: { turbo_confirm: "Are you sure about cancellation?" }, 
+            class: "btn-danger" %>
+
+<%= link_to "Back", bookings_path %>
+
+
+
+
+

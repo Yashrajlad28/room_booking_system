@@ -1,0 +1,175 @@
+ /* =============================================
+       DESIGN TOKENS — edit here, applies everywhere
+       ============================================= */
+    :root {
+      --rb-primary:       #1a1f2e;   /* navbar, footer bg */
+      --rb-accent:        #4e9af1;   /* brand dot, active link, primary btn */
+      --rb-accent-hover:  #3a87e0;
+      --rb-nav-text:      #b0b8cc;   /* inactive nav links */
+      --rb-nav-hover-bg:  rgba(255, 255, 255, 0.07);
+      --rb-nav-active-bg: rgba(78, 154, 241, 0.15);
+      --rb-page-bg:       #f4f6fa;   /* body background */
+      --rb-card-radius:   10px;
+      --rb-card-shadow:   0 1px 4px rgba(0, 0, 0, 0.06);
+    }
+
+    /* =============================================
+       BASE
+       ============================================= */
+    body {
+      background-color: var(--rb-page-bg);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    main {
+      flex: 1;
+    }
+
+    /* =============================================
+       NAVBAR
+       ============================================= */
+    .navbar {
+      background-color: var(--rb-primary) !important;
+      min-height: 60px;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+
+    .navbar-brand {
+      font-size: 1.1rem;
+      font-weight: 500;
+      letter-spacing: -0.2px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .navbar-brand .brand-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--rb-accent);
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    .navbar .nav-link {
+      color: var(--rb-nav-text) !important;
+      font-size: 0.875rem;
+      padding: 6px 12px !important;
+      border-radius: 6px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .navbar .nav-link:hover {
+      background-color: var(--rb-nav-hover-bg);
+      color: #fff !important;
+    }
+
+    .navbar .nav-link.active {
+      background-color: var(--rb-nav-active-bg);
+      color: var(--rb-accent) !important;
+    }
+
+    .navbar-text {
+      color: var(--rb-nav-text) !important;
+      font-size: 0.85rem;
+    }
+
+    .navbar-text strong {
+      color: #fff;
+    }
+
+    /* =============================================
+       NAVBAR BUTTONS
+       ============================================= */
+    .btn-nav-logout {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #fff;
+      font-size: 0.8rem;
+      padding: 5px 14px;
+      border-radius: 6px;
+      transition: background 0.15s;
+    }
+
+    .btn-nav-logout:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .btn-nav-login {
+      background: var(--rb-accent);
+      border: 1px solid var(--rb-accent);
+      color: #fff;
+      font-size: 0.8rem;
+      padding: 5px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+
+    .btn-nav-login:hover {
+      background: var(--rb-accent-hover);
+      color: #fff;
+    }
+
+    /* =============================================
+       FLASH MESSAGES
+       ============================================= */
+    .flash-wrapper {
+      padding: 1rem 0 0;
+    }
+
+    .alert {
+      border-radius: 8px;
+      font-size: 0.875rem;
+      border-width: 1px;
+      padding: 0.75rem 1rem;
+    }
+
+    .alert-success {
+      background-color: #eaf5ee;
+      border-color: #b5ddc2;
+      color: #1e6e38;
+    }
+
+    .alert-danger {
+      background-color: #fceaea;
+      border-color: #f0b0b0;
+      color: #7a1e1e;
+    }
+
+    /* =============================================
+       PAGE CONTENT CARD WRAPPER
+       ============================================= */
+    .page-card {
+      background: #fff;
+      border-radius: var(--rb-card-radius);
+      box-shadow: var(--rb-card-shadow);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      padding: 2rem;
+    }
+
+    /* =============================================
+       FOOTER
+       ============================================= */
+    .rb-footer {
+      background-color: var(--rb-primary);
+      color: #6b7694;
+      font-size: 0.8rem;
+      padding: 1rem 1.5rem;
+      margin-top: 3rem;
+    }
+
+    .rb-footer a {
+      color: #6b7694;
+      text-decoration: none;
+    }
+
+    .rb-footer a:hover {
+      color: var(--rb-nav-text);
+    }
