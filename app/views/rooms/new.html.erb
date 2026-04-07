@@ -1,0 +1,53 @@
+<div class="container mt-4" style="max-width: 75%;">
+
+    <!-- Header -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h3 class="fw-bold mb-0" style="color:#1a1f2e; font-size:1.2rem;">
+                New Room
+            </h3>
+            <p style="font-size:0.8rem; color:#8a93a8;">Create a new Room</p>
+        </div>
+
+        <%= link_to rooms_path, style:"font-size:0.8rem; color:#5a6480;" do %>
+            &#8592; Back
+        <% end %>
+    </div>
+
+    <div style="background:#fff; border-radius:10px;
+     border:1px solid rgba(0,0,0,0.07); overflow:hidden;">
+
+        <div class="px-4 py-3 border-bottom">
+            <h5 style="font-size:0.9rem;">New Room Details</h5>
+        </div>
+
+        <div class="px-4 py-3">
+
+            <%= form_with model: @room do |f| %>
+
+                <!-- Room Name -->
+                <div class="mb-3">
+                <%= f.label :name, class:"form-label" %>
+                <%= f.text_field :name, class:"form-control" %>
+                </div>
+
+                <div class="mb-3">
+                <%= f.label :image, "Add Image", class:"form-label" %>
+                <%= f.file_field :image, class:"form-control" %>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                <%= f.submit "Create Room",
+                    class:"btn",
+                    style:"background:#4e9af1; color:white;" %>
+                </div>
+
+            <% end %>
+
+        </div>
+
+    
+    </div>
+
+</div>
+

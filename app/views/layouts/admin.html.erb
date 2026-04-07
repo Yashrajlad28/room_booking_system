@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Admin · RoomBooking</title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <style>
+    body { background-color: #f4f6fa; font-family: 'Segoe UI', system-ui, sans-serif; }
+  </style>
+</head>
+
+<body>
+
+  <%# ---- Admin Navbar ---- %>
+  <nav class="navbar navbar-expand-lg" style="background-color: #1a1f2e; min-height: 60px;">
+    <div class="container-fluid px-4">
+
+      <%# Brand %>
+      <% if user_signed_in? %>
+        <%= link_to bookings_path, class: "navbar-brand text-white d-flex align-items-center gap-2" do %>
+          <span style="width:8px; height:8px; border-radius:50%;
+                       background:#4e9af1; display:inline-block;"></span>
+          <span class="fw-semibold" style="font-size:1rem;">RoomBooking</span>
+          <span style="background:rgba(78,154,241,0.15); color:#4e9af1; font-size:0.68rem;
+                       font-weight:600; padding:2px 8px; border-radius:20px;
+                       letter-spacing:0.04em;">ADMIN</span>
+        <% end %>
+      <% else %>
+        <%= link_to root_path, class: "navbar-brand text-white d-flex align-items-center gap-2" do %>
+          <span style="width:8px; height:8px; border-radius:50%;
+                       background:#4e9af1; display:inline-block;"></span>
+          <span class="fw-semibold" style="font-size:1rem;">RoomBooking</span>
+        <% end %>
+      <% end %>
+
+      <button class="navbar-toggler border-0" type="button"
+              data-bs-toggle="collapse" data-bs-target="#adminNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="adminNav">
+
+        <%# Left nav links %>
+        <ul class="navbar-nav me-auto">
+          <% if user_signed_in? %>
+
+            <li class="nav-item">
+              <%= link_to "All Bookings", bookings_path,
+                  class: "nav-link #{current_page?(bookings_path) ? 'active' : ''}",
+                  style: "font-size:0.875rem;" %>
+            </li>
+
+            <li class="nav-item">
+              <%= link_to "New Booking", new_booking_path,
+                  class: "nav-link #{current_page?(new_booking_path) ? 'active' : ''}",
+                  style: "font-size:0.875rem;" %>
+            </li>
+
+            <li class="nav-item">
+              <%= link_to "Manage Rooms", rooms_path,
+                  class: "nav-link #{current_page?(rooms_path) ? 'active' : ''}",
+                  style: "font-size:0.875rem;" %>
+            </li>
+
+            <li class="nav-item">
+              <%= link_to "Manage Users", bookings_path,
+                  class: "nav-link",
+                  style: "font-size:0.875rem;" %>
+            </li>
+
+            <li class="nav-item">
+              <%= link_to "Booking Requests", bookings_path,
+                  class: "nav-link",
+                  style: "font-size:0.875rem;" %>
+            </li>
+
+          <% end %>
+        </ul>
+
+        <%# Right side — user + logout %>
+        <ul class="navbar-nav align-items-center gap-2">
+          <% if user_signed_in? %>
+
+            <li class="nav-item">
+              <span style="font-size:0.85rem; color:#b0b8cc;">
+                Welcome, <strong style="color:#fff;"><%= current_user.name %></strong>
+              </span>
+            </li>
+
+            <li class="nav-item">
+              <%= button_to "Logout",
+                  destroy_user_session_path,
+                  method: :delete,
+                  class: "btn-nav-logout" %>
+            </li>
+
+          <% else %>
+
+            <li class="nav-item">
+              <%= link_to "Login", new_user_session_path, class: "btn-nav-login" %>
+            </li>
+
+          <% end %>
+        </ul>
+
+      </div>
+    </div>
+  </nav>
+
+  <%# ---- Flash messages ---- %>
+  <div class="container-fluid px-4 flash-wrapper">
+    <% if notice %>
+      <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+        <i class="bi bi-check-circle me-2"></i><%= notice %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    <% end %>
+    <% if alert %>
+      <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+        <i class="bi bi-exclamation-circle me-2"></i><%= alert %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    <% end %>
+  </div>
+
+  <%# ---- Main content ---- %>
+  <main>
+    <div class="container-fluid px-4 mt-4">
+      <%= yield %>
+    </div>
+  </main>
+
+  <%# ---- Turbo confirm modal (JS-only, no Bootstrap dependency) ---- %>
+  <script>
+    if (window.Turbo) {
+      Turbo.config.drive.confirmationMethod = (message) => {
+        return new Promise((resolve) => {
+          if (!document.getElementById("rb-confirm-styles")) {
+            const s = document.createElement("style")
+            s.id = "rb-confirm-styles"
+            s.textContent = `
+              #rb-confirm-overlay{position:fixed;inset:0;z-index:9999;background:rgba(20,24,38,0.55);display:flex;align-items:center;justify-content:center;}
+              #rb-confirm-box{background:#fff;border-radius:12px;overflow:hidden;width:100%;max-width:360px;box-shadow:0 8px 32px rgba(0,0,0,0.2);font-family:'Segoe UI',system-ui,sans-serif;}
+              #rb-confirm-header{background:#1a1f2e;padding:1.5rem;text-align:center;}
+              #rb-confirm-icon{width:40px;height:40px;border-radius:50%;background:rgba(226,75,74,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 0.75rem;}
+              #rb-confirm-header h6{color:#fff;font-size:0.9rem;font-weight:600;margin:0;}
+              #rb-confirm-body{padding:1.5rem;text-align:center;}
+              #rb-confirm-message{font-size:0.875rem;color:#3a3f52;line-height:1.6;margin-bottom:1.25rem;}
+              #rb-confirm-buttons{display:flex;gap:8px;justify-content:center;}
+              #rb-confirm-cancel{background:transparent;border:1px solid #d1d5e0;color:#1a1f2e;border-radius:7px;padding:8px 20px;font-size:0.84rem;font-weight:500;cursor:pointer;}
+              #rb-confirm-cancel:hover{background:#f4f6fa;}
+              #rb-confirm-ok{background:#e24b4a;color:#fff;border:none;border-radius:7px;padding:8px 20px;font-size:0.84rem;font-weight:500;cursor:pointer;}
+              #rb-confirm-ok:hover{background:#c0392b;}
+            `
+            document.head.appendChild(s)
+          }
+
+          const overlay = document.createElement("div")
+          overlay.id = "rb-confirm-overlay"
+          overlay.innerHTML = `
+            <div id="rb-confirm-box">
+              <div id="rb-confirm-header">
+                <div id="rb-confirm-icon">
+                  <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#e24b4a" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                  </svg>
+                </div>
+                <h6>Confirm action</h6>
+              </div>
+              <div id="rb-confirm-body">
+                <p id="rb-confirm-message">${message}</p>
+                <div id="rb-confirm-buttons">
+                  <button id="rb-confirm-cancel">Cancel</button>
+                  <button id="rb-confirm-ok">Confirm</button>
+                </div>
+              </div>
+            </div>
+          `
+          document.body.appendChild(overlay)
+          const cleanup = () => document.body.removeChild(overlay)
+          overlay.querySelector("#rb-confirm-ok").addEventListener("click", () => { cleanup(); resolve(true) })
+          overlay.querySelector("#rb-confirm-cancel").addEventListener("click", () => { cleanup(); resolve(false) })
+          overlay.addEventListener("click", (e) => { if (e.target === overlay) { cleanup(); resolve(false) } })
+          document.addEventListener("keydown", function h(e) { if (e.key === "Escape") { cleanup(); resolve(false); document.removeEventListener("keydown", h) } })
+        })
+      }
+    }
+  </script>
+
+</body>
+</html>

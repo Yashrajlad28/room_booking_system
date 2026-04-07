@@ -1,17 +1,177 @@
-<h1>Showing the details of Booking</h1>
+<div class="container mt-4" style="max-width: 75%;">
 
+  <%# ---- Page header ---- %>
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+      <h3 class="fw-bold mb-0" style="color: #1a1f2e; font-size: 1.2rem;">
+        Booking #<%= @booking.id %>
+      </h3>
+      <p class="mb-0 mt-1" style="font-size: 0.8rem; color: #8a93a8;">
+        Booking details
+      </p>
+    </div>
+    <%= link_to bookings_path,
+        style: "font-size: 0.8rem; color: #5a6480; text-decoration: none;" do %>
+      &#8592; <%= current_user.admin? ? "All Bookings" : "My Bookings" %>
+    <% end %>
+  </div>
 
-<%= button_to "Delete", booking_path(@booking), method: :delete, 
-data: { turbo_confirm: "Are you sure? You want to delete" } %>
+  <%# ---- Reservation info card ---- %>
+  <div class="mb-4" style="background:#fff; border-radius:10px;
+       border:1px solid rgba(0,0,0,0.07); overflow:hidden;">
 
-<%= link_to "Edit", edit_booking_path %>
+    <%# Card header with status badge %>
+    <div class="d-flex align-items-center gap-2 px-4 py-3"
+         style="border-bottom: 1px solid rgba(0,0,0,0.06);">
+      <span style="width:8px; height:8px; border-radius:50%;
+                   background:#4e9af1; display:inline-block;"></span>
+      <h5 class="mb-0 fw-semibold" style="font-size:0.88rem; color:#1a1f2e;">
+        Reservation info
+      </h5>
 
-<%= button_to "Cancel Booking", cancel_booking_path(@booking), 
-            method: :patch, 
-            data: { turbo_confirm: "Are you sure about cancellation?" }, 
-            class: "btn-danger" %>
+      <%# Status badge — right aligned %>
+      <% if @booking.status == "booked" %>
+        <span class="ms-auto" style="background:#eaf3de; color:#3b6d11;
+              font-size:0.72rem; font-weight:500; padding:3px 10px;
+              border-radius:20px;">
+          Booked
+        </span>
+      <% elsif @booking.status == "cancelled" %>
+        <span class="ms-auto" style="background:#fceaea; color:#7a1e1e;
+              font-size:0.72rem; font-weight:500; padding:3px 10px;
+              border-radius:20px;">
+          Cancelled
+        </span>
+      <% else %>
+        <span class="ms-auto" style="background:#f4f6fa; color:#5a6480;
+              font-size:0.72rem; font-weight:500; padding:3px 10px;
+              border-radius:20px;">
+          <%= @booking.status.capitalize %>
+        </span>
+      <% end %>
+    </div>
 
-<%= link_to "Back", bookings_path %>
+    <%# Detail rows %>
+    <div class="px-4 py-2">
+
+      <div class="d-flex justify-content-between align-items-center py-3"
+           style="border-bottom:1px solid rgba(0,0,0,0.05); font-size:0.875rem;">
+        <span style="color:#8a93a8;">Room</span>
+        <span class="fw-medium" style="color:#1a1f2e;">
+          <%= @booking.room.name %>
+        </span>
+      </div>
+
+      <%# Only admins see the booker's name %>
+      <% if current_user.admin? %>
+        <div class="d-flex justify-content-between align-items-center py-3"
+             style="border-bottom:1px solid rgba(0,0,0,0.05); font-size:0.875rem;">
+          <span style="color:#8a93a8;">Booked by</span>
+          <div class="d-flex align-items-center gap-2">
+            <div style="width:26px; height:26px; border-radius:50%;
+                        background:#e6f1fb; display:flex; align-items:center;
+                        justify-content:center; font-size:0.68rem;
+                        font-weight:600; color:#185fa5;">
+              <%= @booking.user.name.split.map(&:first).join.upcase.first(2) %>
+            </div>
+            <span class="fw-medium" style="color:#1a1f2e;">
+              <%= @booking.user.name %>
+            </span>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="d-flex justify-content-between align-items-center py-3"
+           style="border-bottom:1px solid rgba(0,0,0,0.05); font-size:0.875rem;">
+        <span style="color:#8a93a8;">Date</span>
+        <span class="fw-medium" style="color:#1a1f2e;">
+          <%= @booking.booking_date.strftime("%B %d, %Y") %>
+        </span>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center py-3"
+           style="border-bottom:1px solid rgba(0,0,0,0.05); font-size:0.875rem;">
+        <span style="color:#8a93a8;">Start time</span>
+        <span class="fw-medium" style="color:#1a1f2e;">
+          <%= @booking.start_time.strftime("%I:%M %p") %>
+        </span>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center py-3"
+           style="border-bottom:1px solid rgba(0,0,0,0.05); font-size:0.875rem;">
+        <span style="color:#8a93a8;">End time</span>
+        <span class="fw-medium" style="color:#1a1f2e;">
+          <%= @booking.end_time.strftime("%I:%M %p") %>
+        </span>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center py-3"
+           style="font-size:0.875rem;">
+        <span style="color:#8a93a8;">Booked on</span>
+        <span class="fw-medium" style="color:#1a1f2e;">
+          <%= @booking.created_at.strftime("%B %d, %Y") %>
+        </span>
+      </div>
+
+    </div>
+  </div>
+
+  <%# ---- Room image (if available) ---- %>
+  <% if @booking.room.image.attached? %>
+    <div class="mb-4" style="background:#fff; border-radius:10px;
+         border:1px solid rgba(0,0,0,0.07); overflow:hidden;">
+
+      <div class="d-flex align-items-center gap-2 px-4 py-3"
+           style="border-bottom:1px solid rgba(0,0,0,0.06);">
+        <span style="width:8px; height:8px; border-radius:50%;
+                     background:#639922; display:inline-block;"></span>
+        <h5 class="mb-0 fw-semibold" style="font-size:0.88rem; color:#1a1f2e;">
+          Room photo
+        </h5>
+      </div>
+
+      <%= image_tag url_for(@booking.room.image),
+      style: "width:100%; height:240px; object-fit:cover;" %>
+      
+    </div>
+  <% end %>
+
+  <%# ---- Actions ---- %>
+  <div class="d-flex gap-2 flex-wrap">
+
+    <%# Edit — admin always, member only if booked %>
+    <% if current_user.admin? || @booking.status == "booked" %>
+      <%= link_to "Edit booking", edit_booking_path(@booking),
+          class: "btn fw-medium",
+          style: "background:#4e9af1; color:#fff; border-radius:7px;
+                  font-size:0.875rem; padding:8px 20px;" %>
+    <% end %>
+
+    <%# Cancel — only if currently booked %>
+    <% if @booking.status == "booked" %>
+      <%= button_to "Cancel booking",
+          cancel_booking_path(@booking),
+          method: :patch,
+          data: { turbo_confirm: "Are you sure you want to cancel this booking for #{@booking.room.name}?" },
+          class: "btn fw-medium",
+          style: "background:#faeeda; color:#633806; border:1px solid #f9c56a;
+                  border-radius:7px; font-size:0.875rem; padding:8px 20px;" %>
+    <% end %>
+
+    <%# Delete — admin only %>
+    <% if current_user.admin? %>
+      <%= button_to "Delete booking",
+          booking_path(@booking),
+          method: :delete,
+          data: { turbo_confirm: "Are you sure you want to permanently delete booking ##{@booking.id}? This cannot be undone." },
+          class: "btn fw-medium",
+          style: "background:#fceaea; color:#7a1e1e; border:1px solid #f0b0b0;
+                  border-radius:7px; font-size:0.875rem; padding:8px 20px;" %>
+    <% end %>
+
+  </div>
+
+</div>
 
 
 

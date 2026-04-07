@@ -1,0 +1,62 @@
+<div class="container mt-4" style="max-width: 75%;">
+
+  <%# ---- Page header ---- %>
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+      <h3 class="fw-bold mb-0" style="color: #1a1f2e; font-size: 1.2rem;">All Rooms</h3>
+    </div>
+    <%= link_to bookings_path,
+        style: "font-size: 0.8rem; color: #5a6480; text-decoration: none;" do %>
+      &#8592; My Bookings
+    <% end %>
+  </div>
+
+    <div class="row g-3">
+        <% if @rooms.present? %>
+            <% @rooms.each do |room| %>
+                <div class="col-md-4">
+                    <%= link_to room_path(room), style: "text-decoration: none;" do %>
+                        <div class="h-100 rounded-3 p-3 p-3 d-flex align-items-center justify-content-center gap-2"
+                            style="border: 1px solid rgba(0,0,0,0.08);
+                                    transition: border-color 0.15s, background 0.15s;"
+                            onmouseover="this.style.borderColor='#4e9af1';this.style.background='#f8fbff';"
+                            onmouseout="this.style.borderColor='rgba(0,0,0,0.08)';this.style.background='#fff';">
+
+                            <%# Room name %>
+                            <p class="fw-semibold mb-1" style="font-size: 0.9rem; color: #1a1f2e;">
+                                <%= room.name %>
+                            </p>
+                        </div>
+                    <% end %>
+                </div>
+            <% end %>
+        <% end %>
+
+        <% if current_user.admin? %>
+            <div class="col-md-4">
+                <%= link_to new_room_path, style: "text-decoration: none;" do %>
+                    <div class="h-100 rounded-3 p-3 d-flex align-items-center justify-content-center gap-2"
+                        style="border: 1px solid rgba(0,0,0,0.08);
+                                transition: border-color 0.15s, background 0.15s;"
+                        onmouseover="this.style.borderColor='#4e9af1';this.style.background='#f8fbff';"
+                        onmouseout="this.style.borderColor='rgba(0,0,0,0.08)';this.style.background='#fff';">
+
+                        <!-- Plus Icon -->
+                        <div style="width:36px; height:36px; border-radius:50%;
+                                    background:#eaf2ff; display:flex; align-items:center; justify-content:center;
+                                    margin-bottom:8px;">
+                            <span style="font-size:20px; color:#4e9af1;">+</span>
+                        </div>
+
+                        <p class="fw-semibold mb-0"
+                            style="font-size: 0.85rem; color: #4e9af1;">
+                            Add Room
+                        </p>
+                    </div>
+                <% end %>
+            </div>
+        <% end %>
+        
+    </div>
+
+</div>

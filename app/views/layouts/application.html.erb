@@ -52,6 +52,10 @@
               <%= link_to "My Bookings", bookings_path,
                   class: "nav-link #{current_page?(bookings_path) ? 'active' : ''}" %>
             </li>
+            <li class="nav-item">
+              <%= link_to "View Rooms", rooms_path,
+                  class: "nav-link #{current_page?(rooms_path) ? 'active' : ''}" %>
+            </li>
           <% end %>
         </ul>
 

@@ -1,4 +1,5 @@
 class Room < ApplicationRecord
+    has_one_attached :image
     has_many :bookings
     has_many :users, through: :bookings
 
